@@ -1,6 +1,11 @@
 const RMSD_COLORS = ['#0000ff', '#001bf2', '#0033e6', '#004cd9', '#0066cc', '#007fbf', '#0098b3', '#01b3a6', '#00cc99', '#00e78c'];
 
-var sitename = window.location.pathname.split("/").pop().split('.html').shift().toUpperCase();
+var sitename = "INDEX";
+
+function getSite(n) {
+	console.log(n);
+	sitename = n;
+}
 
 const seriesDataUrls = [
 	'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series01.csv',
@@ -31,7 +36,10 @@ const mapDataUrls = [
 const siteMarkerUrl = 'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/site_markers.csv';
 
 function main() {
-	let graph = new Graph([seriesDataUrls, mapAxisUrl, mapDataUrls, siteMarkerUrl], ['section', 'time-plot', 'scatter-plot', 'map']);
+	let graph;
+	if(sitename != "INDEX") {
+	graph = new Graph([seriesDataUrls, mapAxisUrl, mapDataUrls, siteMarkerUrl], ['section', 'time-plot', 'scatter-plot', 'map']);
+	}
 	console.log(graph);
 }
 
@@ -566,3 +574,19 @@ function getDate(str) {
 }
 
 main();
+
+// accordion
+var accordions = document.getElementsByClassName("accordion");
+for(var i = 0; i < accordions.length; i++) {
+	accordions[i].addEventListener("click", function() {
+		var panel = this.nextElementSibling;
+		var closeAll = document.getElementById("panel");
+		if (panel.style.display === "block") {
+			closeAll.style.display= "none";
+			panel.style.display = "none";
+		} else {
+			closeAll.style.display= "none";
+			panel.style.display = "block";
+		}
+	  });
+}
