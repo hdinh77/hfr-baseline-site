@@ -1,45 +1,58 @@
 const RMSD_COLORS = ['#0000ff', '#001bf2', '#0033e6', '#004cd9', '#0066cc', '#007fbf', '#0098b3', '#01b3a6', '#00cc99', '#00e78c'];
 
 var sitename = "INDEX";
+var seriesDataUrls;
+var mapAxisUrl;
+var mapDataUrls;
+var siteMarkerUrl;
+var numGraphs;
 
-function getSite(n) {
-	console.log(n);
-	sitename = n;
+function setSite(n) {
+	sitename = n.substring(0, n.length - 2);													// up until space
+	numGraphs = n.substring(n.length - 1);														// last digit
+	console.log("sitename: " + sitename + ", numGraphs: " + numGraphs);													
+	seriesDataUrls = [
+		'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series01.csv',
+			'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series02.csv',
+			'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series03.csv',
+			'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series04.csv',
+			'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series05.csv',
+			'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series06.csv',
+			'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series07.csv',
+			'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series08.csv',
+			'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series09.csv',
+	];
+	mapAxisUrl = 'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/map_axis.csv';
+	mapDataUrls = [
+		'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat01.csv',
+		'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat02.csv',
+		'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat03.csv',
+		'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat04.csv',
+		'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat05.csv',
+		'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat06.csv',
+		'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat07.csv',
+		'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat08.csv',
+		'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat09.csv',
+	];
+	siteMarkerUrl = 'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/site_markers.csv';
+
+	main();
 }
 
-const seriesDataUrls = [
-	'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series01.csv',
-        'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series02.csv',
-        'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series03.csv',
-        'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series04.csv',
-        'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series05.csv',
-        'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series06.csv',
-        'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series07.csv',
-        'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series08.csv',
-        'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series09.csv',
-];
-
-const mapAxisUrl = 'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/map_axis.csv';
-
-const mapDataUrls = [
-	'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat01.csv',
-	'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat02.csv',
-	'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat03.csv',
-	'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat04.csv',
-	'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat05.csv',
-	'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat06.csv',
-	'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat07.csv',
-	'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat08.csv',
-	'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat09.csv',
-];
-
-const siteMarkerUrl = 'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/site_markers.csv';
-
 function main() {
-	let graph;
-	if(sitename != "INDEX") {
-	graph = new Graph([seriesDataUrls, mapAxisUrl, mapDataUrls, siteMarkerUrl], ['section', 'time-plot', 'scatter-plot', 'map']);
+	if(sitename == "INDEX") {
+		console.log("HOME");
+		document.getElementById("chart1").style.display = "none";
+		document.getElementById("chart2").style.display = "none";
+		return;
 	}
+
+	let graph = new Graph([seriesDataUrls, mapAxisUrl, mapDataUrls, siteMarkerUrl], ['section', 'time-plot', 'scatter-plot', 'map']);
+	var charts = document.getElementsByClassName("section");
+	for(let i = 0; i < Number.parseInt(numGraphs); i++) {
+		charts[i].style.display = "block";
+	}	
+	
 	console.log(graph);
 }
 
