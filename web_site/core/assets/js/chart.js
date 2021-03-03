@@ -52,6 +52,7 @@ function main() {
 	for(let i = 0; i < Number.parseInt(numGraphs); i++) {
 		charts[i].style.display = "block";
 	}	
+	document.getElementById("category").innerHTML = sitename;
 	
 	console.log(graph);
 }
