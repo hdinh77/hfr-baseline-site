@@ -10,7 +10,6 @@ var numGraphs;
 function setSite(n) {
 	sitename = n.substring(0, n.length - 2);													// up until space
 	numGraphs = n.substring(n.length - 1);														// last digit
-	console.log("sitename: " + sitename + ", numGraphs: " + numGraphs);													
 	seriesDataUrls = [
 		'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series01.csv',
 			'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series02.csv',
@@ -48,10 +47,12 @@ function main() {
 	}
 
 	let graph = new Graph([seriesDataUrls, mapAxisUrl, mapDataUrls, siteMarkerUrl], ['section', 'time-plot', 'scatter-plot', 'map']);
+	
 	var charts = document.getElementsByClassName("section");
 	for(let i = 0; i < Number.parseInt(numGraphs); i++) {
 		charts[i].style.display = "block";
 	}	
+
 	document.getElementById("category").innerHTML = sitename;
 	
 	console.log(graph);
@@ -475,7 +476,7 @@ class Graph {
 			point.visible = this.scatterTime[this.dataIndex][i].getTime() < maxDate && this.scatterTime[this.dataIndex][i].getTime() > minDate;
 			// console.log(this.scatterTime[this.dataIndex][i].getTime(), minDate, maxDate);
 		});
-		console.log(this.scatterData[0].length);
+		// console.log(this.scatterData[0].length);
 
 		this.scatterPlot.series[0].setData(this.scatterData[this.dataIndex]);
 
