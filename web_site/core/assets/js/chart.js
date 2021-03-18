@@ -1,16 +1,20 @@
 const RMSD_COLORS = ['#0000ff', '#001bf2', '#0033e6', '#004cd9', '#0066cc', '#007fbf', '#0098b3', '#01b3a6', '#00cc99', '#00e78c'];
 
 var sitename = "INDEX";
-var seriesDataUrls;
-var mapAxisUrl;
-var mapDataUrls;
-var siteMarkerUrl;
+var baselineSeriesDataUrls;
+var baselineMapAxisUrl;
+var baselineMapDataUrls;
+var baselineSiteMarkerUrl;
+var syntheticSeriesDataUrls;
+var syntheticMapAxisUrl;
+var syntheticMapDataUrls;
+var syntheticSiteMarkerUrl;
 var numGraphs;
 
 function setSite(n) {
 	sitename = n.substring(0, n.length - 2);													// up until space
 	numGraphs = n.substring(n.length - 1);														// last digit
-	seriesDataUrls = [
+	baselineSeriesDataUrls = [
 		'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series01.csv',
 			'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series02.csv',
 			'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series03.csv',
@@ -21,8 +25,8 @@ function setSite(n) {
 			'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series08.csv',
 			'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series09.csv',
 	];
-	mapAxisUrl = 'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/map_axis.csv';
-	mapDataUrls = [
+	baselineMapAxisUrl = 'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/map_axis.csv';
+	baselineMapDataUrls = [
 		'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat01.csv',
 		'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat02.csv',
 		'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat03.csv',
@@ -33,29 +37,75 @@ function setSite(n) {
 		'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat08.csv',
 		'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat09.csv',
 	];
-	siteMarkerUrl = 'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/site_markers.csv';
+	baselineSiteMarkerUrl = 'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/site_markers.csv';
 
 	main();
+}
+
+function setSyntheticUrls() {
+	syntheticSeriesDataUrls = [
+		'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/time_series01.csv',
+			'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/time_series02.csv',
+			'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/time_series03.csv',
+			'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/time_series04.csv',
+			'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/time_series05.csv',
+			'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/time_series06.csv',
+			'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/time_series07.csv',
+			'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/time_series08.csv',
+			'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/time_series09.csv',
+	];
+	syntheticMapAxisUrl = 'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/map_axis.csv';
+	syntheticMapDataUrls = [
+		'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/lonlat01.csv',
+		'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/lonlat02.csv',
+		'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/lonlat03.csv',
+		'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/lonlat04.csv',
+		'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/lonlat05.csv',
+		'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/lonlat06.csv',
+		'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/lonlat07.csv',
+		'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/lonlat08.csv',
+		'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/lonlat09.csv',
+	];
+	bsyntheticSiteMarkerUrl = 'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/site_markers.csv';
 }
 
 function main() {
 	if(sitename == "INDEX") {
 		console.log("HOME");
-		document.getElementById("chart1").style.display = "none";
-		document.getElementById("chart2").style.display = "none";
+		document.getElementById("card-1").style.display = "none";
+		document.getElementById("card-2").style.display = "none";
 		return;
 	}
 
-	let graph = new Graph([seriesDataUrls, mapAxisUrl, mapDataUrls, siteMarkerUrl], ['section', 'time-plot', 'scatter-plot', 'map']);
+	let baselineGraph = null;
+	let syntheticGraph = null;
+
 	
-	var charts = document.getElementsByClassName("section");
+	
+	if(Number.parseInt(numGraphs) == 0) {
+		document.getElementById("card-1").style.display = "block";
+		document.getElementById("chart1").style.display = "none";
+		document.getElementById("card-2").style.display = "none";
+	}else if(Number.parseInt(numGraphs) == 1) {
+		baselineGraph = new Graph([baselineSeriesDataUrls, baselineMapAxisUrl, baselineMapDataUrls, baselineSiteMarkerUrl], ['chart1', 'time-plot-1', 'scatter-plot-1', 'map-1']);
+		document.getElementById("card-2").style.display = "none";
+	}else if(Number.parseInt(numGraphs) > 1) {
+		baselineGraph = new Graph([baselineSeriesDataUrls, baselineMapAxisUrl, baselineMapDataUrls, baselineSiteMarkerUrl], ['chart1', 'time-plot-1', 'scatter-plot-1', 'map-1']);
+		setSyntheticUrls();
+		syntheticGraph = new Graph([syntheticSeriesDataUrls, syntheticMapAxisUrl, syntheticMapDataUrls, syntheticSiteMarkerUrl], ['chart2', 'time-plot-2', 'scatter-plot-2', 'map-2']);
+	}
+
+	
+	var charts = document.getElementsByClassName("card");
+	var sections = document.getElementsByClassName("section");
 	for(let i = 0; i < Number.parseInt(numGraphs); i++) {
 		charts[i].style.display = "block";
-	}	
+		sections[i].style.display = "block";
+	}
 
 	document.getElementById("category").innerHTML = sitename;
 	
-	console.log(graph);
+	console.log(baselineGraph);
 }
 
 class Graph {
@@ -73,11 +123,11 @@ class Graph {
 		this.mapData = [];
 		this.scatterLegend = null;
 
-		let [ seriesDataUrls, mapAxisUrl, mapDataUrls, siteMarkerUrl ] = urls;
+		let [ baselineSeriesDataUrls, baselineMapAxisUrl, baselineMapDataUrls, baselineSiteMarkerUrl ] = urls;
 		[ this.sectionContainer, this.timeSeriesContainer, this.scatterPlotContainer, this.mapContainer ] = containers;
 
 		Promise.all([
-			...seriesDataUrls.map(url => fetch(url)),
+			...baselineSeriesDataUrls.map(url => fetch(url)),
 		])
 		.then(async res => {
 			let header = [];
@@ -129,9 +179,9 @@ class Graph {
 		});
 
 		Promise.all([
-			fetch(mapAxisUrl),
-			fetch(siteMarkerUrl),
-			...mapDataUrls.map(url => fetch(url)),
+			fetch(baselineMapAxisUrl),
+			fetch(baselineSiteMarkerUrl),
+			...baselineMapDataUrls.map(url => fetch(url)),
 		])
 		.then(async res => {
 			let axisData = res.shift();
