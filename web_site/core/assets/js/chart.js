@@ -12,31 +12,22 @@ var syntheticSiteMarkerUrl;
 var numGraphs;
 
 function setSite(n) {
-	sitename = n.substring(0, n.length - 2);													// up until space
-	numGraphs = n.substring(n.length - 1);														// last digit
-	baselineSeriesDataUrls = [
-		'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series01.csv',
-			'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series02.csv',
-			'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series03.csv',
-			'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series04.csv',
-			'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series05.csv',
-			'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series06.csv',
-			'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series07.csv',
-			'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series08.csv',
-			'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series09.csv',
-	];
+	var string = n.split(" ");
+	sitename = string[0];
+	numGraphs = string[1];
+	numFiles = string[2];
+	console.log(sitename + "," + numGraphs + "," + numFiles);
+
+	baselineSeriesDataUrls = [];
+	baselineMapDataUrls = [];
+	for(var i = 1; i <= numFiles; i++) {
+		let cur1 = 'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series0' + i + '.csv';
+		let cur2 = 'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat0' + i + '.csv';
+		baselineSeriesDataUrls.push(cur1);
+		baselineMapDataUrls.push(cur2);
+	}
+
 	baselineMapAxisUrl = 'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/map_axis.csv';
-	baselineMapDataUrls = [
-		'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat01.csv',
-		'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat02.csv',
-		'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat03.csv',
-		'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat04.csv',
-		'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat05.csv',
-		'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat06.csv',
-		'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat07.csv',
-		'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat08.csv',
-		'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat09.csv',
-	];
 	baselineSiteMarkerUrl = 'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/site_markers.csv';
 
 	main();
@@ -66,7 +57,14 @@ function setSyntheticUrls() {
 		'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/lonlat08.csv',
 		'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/lonlat09.csv',
 	];
-	bsyntheticSiteMarkerUrl = 'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/site_markers.csv';
+	syntheticSiteMarkerUrl = 'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/site_markers.csv';
+}
+
+function setDisplay(card1, chart1, card2, chart2) {
+	document.getElementById("card-1").style.display = card1;
+	document.getElementById("chart1").style.display = chart1;
+	document.getElementById("card-2").style.display = card2;
+	document.getElementById("chart2").style.display = chart2;
 }
 
 function main() {
@@ -83,29 +81,23 @@ function main() {
 	
 	
 	if(Number.parseInt(numGraphs) == 0) {
-		document.getElementById("card-1").style.display = "block";
-		document.getElementById("chart1").style.display = "none";
-		document.getElementById("card-2").style.display = "none";
+		setDisplay("block", "none", "none", "none");
 	}else if(Number.parseInt(numGraphs) == 1) {
 		baselineGraph = new Graph([baselineSeriesDataUrls, baselineMapAxisUrl, baselineMapDataUrls, baselineSiteMarkerUrl], ['chart1', 'time-plot-1', 'scatter-plot-1', 'map-1']);
-		document.getElementById("card-2").style.display = "none";
-	}else if(Number.parseInt(numGraphs) > 1) {
+		setDisplay("block", "block", "none", "none");
+	}else if(Number.parseInt(numGraphs) == 2) {
+		setSyntheticUrls();
+		syntheticGraph = new Graph([syntheticSeriesDataUrls, syntheticMapAxisUrl, syntheticMapDataUrls, syntheticSiteMarkerUrl], ['chart2', 'time-plot-2', 'scatter-plot-2', 'map-2']);
+		setDisplay("none", "none", "block", "block");
+	}else if(Number.parseInt(numGraphs) == 12) {
 		baselineGraph = new Graph([baselineSeriesDataUrls, baselineMapAxisUrl, baselineMapDataUrls, baselineSiteMarkerUrl], ['chart1', 'time-plot-1', 'scatter-plot-1', 'map-1']);
 		setSyntheticUrls();
 		syntheticGraph = new Graph([syntheticSeriesDataUrls, syntheticMapAxisUrl, syntheticMapDataUrls, syntheticSiteMarkerUrl], ['chart2', 'time-plot-2', 'scatter-plot-2', 'map-2']);
+		setDisplay("block", "block", "block", "block");
 	}
 
-	
-	var charts = document.getElementsByClassName("card");
-	var sections = document.getElementsByClassName("section");
-	for(let i = 0; i < Number.parseInt(numGraphs); i++) {
-		charts[i].style.display = "block";
-		sections[i].style.display = "block";
-	}
-
-	document.getElementById("category").innerHTML = sitename;
-	
-	console.log(baselineGraph);
+	document.getElementById("category1").innerHTML = sitename;
+	document.getElementById("category2").innerHTML = sitename;
 }
 
 class Graph {
