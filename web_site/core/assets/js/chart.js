@@ -15,12 +15,14 @@ function setSite(n) {
 	var string = n.split(" ");
 	sitename = string[0];
 	numGraphs = string[1];
-	numFiles = string[2];
-	console.log(sitename + "," + numGraphs + "," + numFiles);
+	numFilesBaseline = string[2];
+	numFilesSynthetic = string[3];
+
+	console.log(sitename + "," + numGraphs + "," + numFilesBaseline + ", " + numFilesSynthetic);
 
 	baselineSeriesDataUrls = [];
 	baselineMapDataUrls = [];
-	for(var i = 1; i <= numFiles; i++) {
+	for(var i = 1; i <= numFilesBaseline; i++) {
 		let cur1 = 'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/time_series0' + i + '.csv';
 		let cur2 = 'https://hfradar.msi.ucsb.edu/baseline/' + sitename + '/lonlat0' + i + '.csv';
 		baselineSeriesDataUrls.push(cur1);
@@ -34,29 +36,16 @@ function setSite(n) {
 }
 
 function setSyntheticUrls() {
-	syntheticSeriesDataUrls = [
-		'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/time_series01.csv',
-			'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/time_series02.csv',
-			'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/time_series03.csv',
-			'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/time_series04.csv',
-			'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/time_series05.csv',
-			'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/time_series06.csv',
-			'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/time_series07.csv',
-			'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/time_series08.csv',
-			'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/time_series09.csv',
-	];
+	syntheticSeriesDataUrls = [];
+	syntheticMapDataUrls = [];
+	for(var i = 1; i <= numFilesSynthetic; i++) {
+		let cur1 = 'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/time_series0' + i + '.csv';
+		let cur2 = 'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/lonlat0' + i + '.csv';
+		syntheticSeriesDataUrls.push(cur1);
+		syntheticMapDataUrls.push(cur2);
+	}
+
 	syntheticMapAxisUrl = 'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/map_axis.csv';
-	syntheticMapDataUrls = [
-		'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/lonlat01.csv',
-		'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/lonlat02.csv',
-		'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/lonlat03.csv',
-		'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/lonlat04.csv',
-		'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/lonlat05.csv',
-		'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/lonlat06.csv',
-		'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/lonlat07.csv',
-		'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/lonlat08.csv',
-		'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/lonlat09.csv',
-	];
 	syntheticSiteMarkerUrl = 'https://hfradar.msi.ucsb.edu/synthetic/' + sitename + '/site_markers.csv';
 }
 
@@ -69,7 +58,6 @@ function setDisplay(card1, chart1, card2, chart2) {
 
 function main() {
 	if(sitename == "INDEX") {
-		console.log("HOME");
 		document.getElementById("card-1").style.display = "none";
 		document.getElementById("card-2").style.display = "none";
 		return;
@@ -118,6 +106,41 @@ class Graph {
 		let [ baselineSeriesDataUrls, baselineMapAxisUrl, baselineMapDataUrls, baselineSiteMarkerUrl ] = urls;
 		[ this.sectionContainer, this.timeSeriesContainer, this.scatterPlotContainer, this.mapContainer ] = containers;
 
+		this.labelNames = [];
+		
+
+		Promise.all([
+			fetch(baselineMapAxisUrl),
+			fetch(baselineSiteMarkerUrl),
+			...baselineMapDataUrls.map(url => fetch(url)),
+		])
+		.then(async res => {
+			let axisData = res.shift();
+			let axisRange = getAxisRange(await axisData.text());
+
+			let siteMarkers = (await res.shift().text()).split('\n');
+			siteMarkers.shift();
+			siteMarkers.pop();
+			siteMarkers = getSiteMarkersData(siteMarkers);
+
+			for(let i = 0; i < siteMarkers.length; i++) {
+				this.labelNames.push(siteMarkers[i].name);
+			}
+
+			for (let i in res) {
+				let text = await res[i].text();
+				let data = text.split('\n');
+				data.shift();
+				data.pop();
+
+				let coord = getMarkersData(data);
+				this.mapData.push(...coord);
+			}
+
+			this.mapData.push(...siteMarkers);
+			this.graphMapPlot(axisRange);
+		});
+
 		Promise.all([
 			...baselineSeriesDataUrls.map(url => fetch(url)),
 		])
@@ -164,49 +187,29 @@ class Graph {
 					}
 				});
 			}
-
 			this.graphTimeSeries(header);
 			this.graphScatterPlot(header);
 			this.updateBackground();
 		});
-
-		Promise.all([
-			fetch(baselineMapAxisUrl),
-			fetch(baselineSiteMarkerUrl),
-			...baselineMapDataUrls.map(url => fetch(url)),
-		])
-		.then(async res => {
-			let axisData = res.shift();
-			let axisRange = getAxisRange(await axisData.text());
-
-			let siteMarkers = (await res.shift().text()).split('\n');
-			siteMarkers.shift();
-			siteMarkers.pop();
-			siteMarkers = getSiteMarkersData(siteMarkers);
-
-			for (let i in res) {
-				let text = await res[i].text();
-
-				let data = text.split('\n');
-				data.shift();
-				data.pop();
-
-				let coord = getMarkersData(data);
-				this.mapData.push(...coord);
-			}
-
-			this.mapData.push(...siteMarkers);
-			this.graphMapPlot(axisRange);
-		});
-	}
+ 	}
 
 	graphTimeSeries(header) {
 		let chartTitle = 'Time Series Plot';
 
+		let name1 = "";
+		let name2 = "";
+		if(this.labelNames.length == 2) {
+			name1 = this.labelNames[0];
+			name2 = this.labelNames[1];
+		}else {
+			name1 = this.labelNames[0];
+			name2 = this.labelNames[1] + " & " + this.labelNames[2];
+		}
+
 		// Parse
 		let series = [
 			{
-				name: header[1],
+				name: name1,
 				data: this.timeSeries1Data[this.dataIndex],
 				marker: {
 					enabled: true,
@@ -214,7 +217,7 @@ class Graph {
 				},
 			},
 			{
-				name: header[2],
+				name: name2,
 				data: this.timeSeries2Data[this.dataIndex],
 				marker: {
 					enabled: true,
@@ -331,8 +334,20 @@ class Graph {
 			navigator: {
 				enabled: false
 			},
-			series: series
+			series: series,
+			responsive: {
+				rules: [{
+					condition: {
+						maxWidth: 500
+					},
+					// Make the labels less space demanding on mobile
+					chartOptions: {
+						width: 100//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+					}
+				}]
+			}
 		});
+		
 	}
 
 	graphScatterPlot(header) {
@@ -349,7 +364,7 @@ class Graph {
 		// Parse
 		let series = [
 			{
-				name: 'Dataset1',
+				name: 'Dataset',
 				type: 'scatter',
 				turboThreshold: 0,
 				data: [...this.scatterData[this.dataIndex]],
@@ -376,6 +391,16 @@ class Graph {
 			}
 		];
 
+		let name1 = "";
+		let name2 = "";
+		if(this.labelNames.length == 2) {
+			name1 = this.labelNames[0];
+			name2 = this.labelNames[1];
+		}else {
+			name1 = this.labelNames[0];
+			name2 = this.labelNames[1] + " & " + this.labelNames[2];
+		}
+
 
 		// Build
 		this.scatterPlot = Highcharts.chart(this.scatterPlotContainer, {
@@ -385,6 +410,7 @@ class Graph {
 				plotBorderWidth: 2,
 				borderRadius: 5,
 				plotBackgroundColor: 'white',
+
 			},
 			title: {
 				text: chartTitle,
@@ -397,7 +423,7 @@ class Graph {
 			},
 			xAxis: {
 				title: {
-					text: header[1],
+					text: name1,
 					style: {
 						color: 'black'
 					},
@@ -410,7 +436,7 @@ class Graph {
 			},
 			yAxis: {
 				title: {
-					text: header[2],
+					text: name2,
 					style: {
 						color: 'black'
 					},
@@ -429,10 +455,10 @@ class Graph {
 			navigator: {
 				enabled: false
 			},
-			series: series
+			series: series,
 		});
 
-
+		this.scatterPlot.setSize(null);
 		// Update regression data
 		this.updateRegression();
 	}
@@ -443,7 +469,20 @@ class Graph {
 		this.map = new google.maps.Map(document.getElementById(this.mapContainer), {
 			center:new google.maps.LatLng((minLat + maxLat) / 2.0, (minLng + maxLng) / 2.0),
 			zoom: 8,
-			mapTypeId: google.maps.MapTypeId.SATELLITE
+			disableDefaultUI: true,
+			mapTypeId: google.maps.MapTypeId.SATELLITE,
+			zoomControl: true,
+			zoomControlOptions: {
+				style: google.maps.ZoomControlStyle.SMALL,
+				position: google.maps.ControlPosition.RIGHT_BOTTOM,
+			},
+			mapTypeControl: true,
+			mapTypeControlOptions: {
+				style: google.maps.MapTypeControlStyle.SMALL,
+				position: google.maps.ControlPosition.LEFT_BOTTOM,
+			},
+			fullscreenControl: true,
+			controlSize: 20
 		});
 
 		this.infowindow = new google.maps.InfoWindow();
@@ -544,7 +583,7 @@ class Graph {
 		);
 
 		this.scatterPlot.setSubtitle({
-			text: `R<sup>2</sup> = ${ regressionData.r2.toFixed(2) } &nbsp;&nbsp;&nbsp; RMSD = ${ rms.toFixed(1) } cm/s &nbsp;&nbsp;&nbsp; N = ${ regressionData.points.length }`,
+			text: `R<sup>2</sup> = ${ regressionData.r2.toFixed(2) } &nbsp; | &nbsp; RMSD = ${ rms.toFixed(1) } cm/s &nbsp; | &nbsp; N = ${ regressionData.points.length }`,
 			useHTML: true,
 		});
 	}
@@ -564,7 +603,12 @@ class Graph {
 			'white';
 
 		// Set section color
-		$('#' + this.sectionContainer).css('background-color', color);
+
+		let temp = '#chart' +  (this.sectionContainer).charAt(5);
+		console.log(temp);
+		$(temp).css('background-color', 'white');
+		$(temp).css('background-color', color);
+		
 
 		// Set time series chart color
 		this.timeSeries.update({
