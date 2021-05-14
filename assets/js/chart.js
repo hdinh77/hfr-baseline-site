@@ -18,8 +18,6 @@ function setSite(n) {
 	numFilesBaseline = string[2];
 	numFilesSynthetic = string[3];
 
-	console.log(sitename + "," + numGraphs + "," + numFilesBaseline + ", " + numFilesSynthetic);
-
 	baselineSeriesDataUrls = [];
 	baselineMapDataUrls = [];
 	for(var i = 1; i <= numFilesBaseline; i++) {
@@ -603,7 +601,6 @@ class Graph {
 			'white';
 
 		// Set section color
-		console.log(color);
 		$('#' + this.sectionContainer).css('background-color', color);	
 
 		// Set time series chart color
