@@ -11,6 +11,14 @@ var syntheticMapDataUrls;
 var syntheticSiteMarkerUrl;
 var numGraphs;
 
+function toggle(name) {
+	if(document.getElementById(name).style.display == "block") {
+		document.getElementById(name).style.dispay = "none";
+	}else {
+		document.getElementById(name).style.display == "block";
+	}
+}
+
 function setSite(n) {
 	var string = n.split(" ");
 	sitename = string[0];
@@ -49,17 +57,20 @@ function setSyntheticUrls() {
 
 function setDisplay(card1, chart1, card2, chart2) {
 	document.getElementById("card-1").style.display = card1;
-	document.getElementById("chart1").style.display = chart1;
+	document.getElementById("chart-1").style.display = chart1;
 	document.getElementById("card-2").style.display = card2;
-	document.getElementById("chart2").style.display = chart2;
+	document.getElementById("chart-2").style.display = chart2;
 }
 
 function main() {
 	if(sitename == "INDEX") {
+		document.getElementById("dashboard").style.display = "block";
 		document.getElementById("card-1").style.display = "none";
 		document.getElementById("card-2").style.display = "none";
 		return;
 	}
+
+	document.getElementById("dashboard").style.display = "none";
 
 	let baselineGraph = null;
 	let syntheticGraph = null;
@@ -69,16 +80,16 @@ function main() {
 	if(Number.parseInt(numGraphs) == 0) {
 		setDisplay("block", "none", "none", "none");
 	}else if(Number.parseInt(numGraphs) == 1) {
-		baselineGraph = new Graph([baselineSeriesDataUrls, baselineMapAxisUrl, baselineMapDataUrls, baselineSiteMarkerUrl], ['chart1', 'time-plot-1', 'scatter-plot-1', 'map-1']);
+		baselineGraph = new Graph([baselineSeriesDataUrls, baselineMapAxisUrl, baselineMapDataUrls, baselineSiteMarkerUrl], ['chart-1', 'time-plot-1', 'scatter-plot-1', 'map-1']);
 		setDisplay("block", "block", "none", "none");
 	}else if(Number.parseInt(numGraphs) == 2) {
 		setSyntheticUrls();
-		syntheticGraph = new Graph([syntheticSeriesDataUrls, syntheticMapAxisUrl, syntheticMapDataUrls, syntheticSiteMarkerUrl], ['chart2', 'time-plot-2', 'scatter-plot-2', 'map-2']);
+		syntheticGraph = new Graph([syntheticSeriesDataUrls, syntheticMapAxisUrl, syntheticMapDataUrls, syntheticSiteMarkerUrl], ['chart-2', 'time-plot-2', 'scatter-plot-2', 'map-2']);
 		setDisplay("none", "none", "block", "block");
 	}else if(Number.parseInt(numGraphs) == 12) {
-		baselineGraph = new Graph([baselineSeriesDataUrls, baselineMapAxisUrl, baselineMapDataUrls, baselineSiteMarkerUrl], ['chart1', 'time-plot-1', 'scatter-plot-1', 'map-1']);
+		baselineGraph = new Graph([baselineSeriesDataUrls, baselineMapAxisUrl, baselineMapDataUrls, baselineSiteMarkerUrl], ['chart-1', 'time-plot-1', 'scatter-plot-1', 'map-1']);
 		setSyntheticUrls();
-		syntheticGraph = new Graph([syntheticSeriesDataUrls, syntheticMapAxisUrl, syntheticMapDataUrls, syntheticSiteMarkerUrl], ['chart2', 'time-plot-2', 'scatter-plot-2', 'map-2']);
+		syntheticGraph = new Graph([syntheticSeriesDataUrls, syntheticMapAxisUrl, syntheticMapDataUrls, syntheticSiteMarkerUrl], ['chart-2', 'time-plot-2', 'scatter-plot-2', 'map-2']);
 		setDisplay("block", "block", "block", "block");
 	}
 
@@ -598,10 +609,11 @@ class Graph {
 		let color =
 			daysDiff > 7 ? '#d98686' :
 			daysDiff > 1 ? '#ffe48c' :
-			'white';
+			'#ffffff';
 
-		// Set section color
+		// Set section colors
 		$('#' + this.sectionContainer).css('background-color', color);	
+		//document.getElementById(this.sectionContainer).style.backgroundColor = color;	
 
 		// Set time series chart color
 		this.timeSeries.update({

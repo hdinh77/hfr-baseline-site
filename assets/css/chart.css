@@ -18,6 +18,15 @@
 	display: none;
 }
 
+#divider {
+	margin-top: 5;
+	margin-bottom: 0;
+}
+
+#picture {
+	scale: 80%;
+}
+
 .horizontal {
 	display: flex;
 	justify-content: space-between;

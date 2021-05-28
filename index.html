@@ -38,7 +38,7 @@
 
     	<div class="sidebar-wrapper">
             <div class="logo">
-                <a href="#" class="simple-text">
+                <a href="#" onclick="setSite('INDEX')" class="simple-text">
                     HFR QC
                 </a>
             </div>
@@ -57,7 +57,7 @@
                     </a>
                </li> 
                <div id="panel">
-                   <a href="#" name="PBRW 0 0 0" onclick="setSite(this.name)"><p>PBRW</p></a>
+                   <a href="#" name="PBRW 1 9 0" onclick="setSite(this.name)"><p>PBRW</p></a>
                    <a href="#" name="WAIN 0 0 0" onclick="setSite(this.name)"><p>WAIN</p></a>
                </div>
 
@@ -141,7 +141,7 @@
                 <div id="panel">
                     <a href="#" name="NANT 0 0 0" onclick="setSite(this.name)"><p>NANT</p></a>
                     <a href="#" name="MVCO 0 0 0" onclick="setSite(this.name)"><p>MVCO</p></a>
-                    <a href="#" name="BLCK 1 2 0" onclick="setSite(this.name)"><p>BLCK</p></a>
+                    <a href="#" name="BLCK 1 9 0" onclick="setSite(this.name)"><p>BLCK</p></a>
                     <a href="#" name="AMAG 2 0 9" onclick="setSite(this.name)"><p>AMAG</p></a>
                     <a href="#" name="MRCH 2 0 9" onclick="setSite(this.name)"><p>MRCH</p></a>
                     <a href="#" name="HEMP 12 3 9" onclick="setSite(this.name)"><p>HEMP</p></a>
@@ -313,7 +313,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="#">Dashboard</a>
+                    <a class="navbar-brand" href="#" onclick="setSite('INDEX')">Dashboard</a>
                 </div>
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav navbar-right">
@@ -342,16 +342,48 @@
         <!-- SITE_BODY.HTML TEMPLATE MODS INSERT HERE -->
         <!-- XXXXX --> 
                     <div class="col-md-12">
+                        <div class="card" id="dashboard">
+                            <div class="header">
+                                <h4 class="title">High Frequency Radar Quality Control Site</h4>
+                            </div>
+                            <hr id="divider">
+                            <div class="content" id="content-dashboard">
+                                <h5><strong>Introduction/Information Blurb here</strong></h5>
+                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras viverra dui eget tempus blandit. Sed blandit viverra
+                                    augue, in semper velit ornare a. Vivamus volutpat sollicitudin tempus. Donec auctor eu mi eu egestas. Sed lorem
+                                    metus, tempus sed nulla quis, sagittis tincidunt tortor. Mauris consectetur dapibus sem id rhoncus. Ut eget nulla
+                                    interdum, hendrerit sapien nec, pretium dui. Nullam mauris dui, mattis ut nisi at, consectetur vehicula neque.
+                                </p>
+                                <br>
+                                <h5><strong>Tutorial/Documentation</strong></h5>
+                                <p>
+                                    NEED TO CREATE DESCRIPTIONS OF THESE:
+                                    <br>
+                                    <span style="color: rgb(2, 136, 141)">BLUE</span> = general overview of this graph/map
+                                    <br>
+                                    <span style="color: red">RED</span> = more specific description of what this graph/point is showing
+                                </p>
+                                <p class="active accordion">Times Series Plot</p>
+                                <img style="display: block;" id="time_pic" src="assets/img/time_plot.jpg" />
+                                <br><br>
+                                <p class="active accordion">Scatter Plot</p>
+                                <img src="assets/img/scatter_plot.jpg" />
+                                <br><br>
+                                <p class="active accordion">Baseline Radials Map</p>
+                                <img src="assets/img/map.jpg" />
+                            </div>
+                        </div>
+
                         <div class="card" id="card-1">
                             <div class="header">
                                 <h4 class="title">Baseline Radial Comparison</h4>
                                 <p class="category" id="category1">info</p>
                             </div>
                             <div class="content" id="content-1">
-                                <div class="section" id="chart1">
+                                <div class="section" id="chart-1">
                                     <div id="time-plot-1" class="time-plot"></div>
                                     <hr id="divide">
-                                    <div class="horizontal">
+                                    <div class="horizontal" id="horizontal-1">
                                         <div id="scatter-plot-1" class="scatter-plot"></div>
                                         <div id="map-1" class="map"></div>
                                         <img class="rmsd-scale" src="assets/img/rmsd_scale.png"/>
@@ -365,10 +397,10 @@
                                 <p class="category" id="category2">info</p>
                             </div>
                             <div class="content" id="content-2">
-                                <div class="section" id="chart2">
+                                <div class="section" id="chart-2">
                                     <div id="time-plot-2" class="time-plot"></div>
                                     <hr id="divide">
-                                    <div class="horizontal">
+                                    <div class="horizontal" id="horizontal-2">
                                         <div id="scatter-plot-2" class="scatter-plot"></div>
                                         <div id="map-2" class="map"></div>
                                         <img class="rmsd-scale" src="assets/img/rmsd_scale.png"/>
