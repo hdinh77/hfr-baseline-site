@@ -225,6 +225,7 @@ class Graph {
 	graphTimeSeries(header) {
 		let chartTitle = 'Time Series Plot';
 
+		
 		let name1 = "";
 		let name2 = "";
 		if(this.labelNames.length == 2) {
